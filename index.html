@@ -141,28 +141,37 @@
 
     .progress-bar-wrap { padding: 14px 20px 12px; border-bottom: 1px solid rgba(255,255,255,.05); }
     .progress-top {
-      display: flex; justify-content: space-between; align-items: baseline;
-      margin-bottom: 8px; font-size: 13px; color: rgba(255,255,255,.55);
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 8px;
     }
-    .progress-num {
+    .progress-left { font-size: 13px; color: rgba(255,255,255,.5); }
+    .progress-right {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .live-score-badge {
       font-family: 'Black Han Sans', sans-serif;
-      font-size: 17px; color: #a29bfe;
+      font-size: 18px; transition: color .3s;
+    }
+    .checked-badge {
+      font-size: 12px; color: rgba(255,255,255,.4);
+      background: rgba(255,255,255,.07);
+      border-radius: 100px; padding: 3px 9px;
     }
     .progress-track {
-      height: 5px; background: rgba(255,255,255,.1);
+      height: 6px; background: rgba(255,255,255,.1);
       border-radius: 100px; overflow: hidden;
     }
     .progress-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #6c5ce7, #fd79a8);
-      border-radius: 100px; width: 0%; transition: width .3s ease;
+      height: 100%; border-radius: 100px; width: 50%;
+      transition: width .35s ease, background-color .35s;
     }
 
     .items-list { flex: 1; overflow-y: auto; padding: 12px 16px 120px; }
 
+    /* ─── ITEM CARDS ─── */
     .item-card {
       display: flex; align-items: center; gap: 12px;
-      padding: 13px 15px; border-radius: 14px; margin-bottom: 9px;
+      padding: 13px 14px; border-radius: 14px; margin-bottom: 9px;
       background: rgba(255,255,255,.05);
       border: 1.5px solid rgba(255,255,255,.07);
       cursor: pointer; transition: all .22s ease;
@@ -170,16 +179,31 @@
     }
     .item-card:active { transform: scale(.97); }
 
-    .item-card.cat-sleep  { --cc: #6c5ce7; --cg: rgba(108,92,231,.18); }
-    .item-card.cat-food   { --cc: #e17055; --cg: rgba(225,112,85,.18); }
-    .item-card.cat-digital{ --cc: #0984e3; --cg: rgba(9,132,227,.18); }
-    .item-card.cat-health { --cc: #00b894; --cg: rgba(0,184,148,.18); }
-    .item-card.cat-social { --cc: #fd79a8; --cg: rgba(253,121,168,.18); }
+    /* category color vars — bad items */
+    .item-card.cat-sleep   { --cc: #6c5ce7; --cg: rgba(108,92,231,.18); }
+    .item-card.cat-food    { --cc: #e17055; --cg: rgba(225,112,85,.18); }
+    .item-card.cat-digital { --cc: #0984e3; --cg: rgba(9,132,227,.18); }
+    .item-card.cat-health  { --cc: #00b894; --cg: rgba(0,184,148,.18); }
+    .item-card.cat-social  { --cc: #fd79a8; --cg: rgba(253,121,168,.18); }
+
+    /* good items override to teal */
+    .item-card.type-good { --cc: #00cec9; --cg: rgba(0,206,201,.15); }
 
     .item-card.checked {
       background: var(--cg);
       border-color: var(--cc);
     }
+
+    /* left accent bar */
+    .item-card.type-good::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 6px; bottom: 6px;
+      width: 3px; border-radius: 2px;
+      background: #00cec9;
+      opacity: .7;
+    }
+    .item-card { position: relative; }
 
     .checkbox {
       width: 26px; height: 26px; border-radius: 8px;
@@ -197,9 +221,27 @@
     }
     .item-card.checked .check-mark { opacity: 1; transform: scale(1) rotate(0); }
 
-    .cat-icon { font-size: 17px; flex-shrink: 0; }
+    .cat-icon { font-size: 16px; flex-shrink: 0; }
     .item-text { font-size: 14px; line-height: 1.5; color: rgba(255,255,255,.8); flex: 1; }
     .item-card.checked .item-text { color: #fff; }
+
+    .item-score {
+      font-size: 11px; font-weight: 700; flex-shrink: 0;
+      padding: 3px 7px; border-radius: 100px; letter-spacing: .02em;
+      transition: all .2s;
+    }
+    .item-score.score-good {
+      color: #00cec9; background: rgba(0,206,201,.15);
+    }
+    .item-score.score-bad {
+      color: rgba(255,120,120,.9); background: rgba(255,100,100,.12);
+    }
+    .item-card.checked .item-score.score-good {
+      background: rgba(0,206,201,.3); color: #7ffff4;
+    }
+    .item-card.checked .item-score.score-bad {
+      background: rgba(255,100,100,.25); color: #ffb3b3;
+    }
 
     .test-footer {
       position: fixed; bottom: 0; left: 50%;
@@ -232,7 +274,13 @@
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       background-clip: text;
     }
-    .result-human { font-size: 18px; color: rgba(255,255,255,.75); margin-bottom: 32px; }
+    .result-human { font-size: 18px; color: rgba(255,255,255,.75); margin-bottom: 12px; }
+    .result-breakdown {
+      display: flex; justify-content: center; gap: 16px;
+      margin-bottom: 28px; font-size: 13px;
+    }
+    .rb-good { color: #00cec9; }
+    .rb-bad  { color: rgba(255,130,130,.9); }
 
     /* ─── CARD ─── */
     .card-wrap {
@@ -265,10 +313,10 @@
     .card-inner {
       position: relative; z-index: 1;
       height: 100%; display: flex; flex-direction: column;
-      align-items: center; padding: 40px 28px 28px;
+      align-items: center; padding: 36px 28px 28px;
     }
 
-    .card-top { text-align: center; margin-bottom: 20px; }
+    .card-top { text-align: center; margin-bottom: 16px; }
     .card-date-str { font-size: 13px; color: rgba(255,255,255,.7); margin-bottom: 5px; }
     .card-app-name {
       font-family: 'Black Han Sans', sans-serif;
@@ -276,15 +324,15 @@
     }
 
     .card-circle-wrap {
-      position: relative; width: 190px; height: 190px;
-      margin-bottom: 18px; flex-shrink: 0;
+      position: relative; width: 186px; height: 186px;
+      margin-bottom: 14px; flex-shrink: 0;
     }
-    .card-circle-svg { width: 190px; height: 190px; transform: rotate(-90deg); }
+    .card-circle-svg { width: 186px; height: 186px; transform: rotate(-90deg); }
     .c-bg { fill: none; stroke: rgba(255,255,255,.18); stroke-width: 11; }
     .c-prog {
       fill: none; stroke: rgba(255,255,255,.95); stroke-width: 11;
       stroke-linecap: round;
-      stroke-dasharray: 477.52; stroke-dashoffset: 477.52;
+      stroke-dasharray: 465; stroke-dashoffset: 465;
       transition: stroke-dashoffset 1.6s cubic-bezier(.16,1,.3,1);
     }
     .card-circle-center {
@@ -293,25 +341,35 @@
     }
     .card-pct {
       font-family: 'Black Han Sans', sans-serif;
-      font-size: 54px; line-height: 1; color: #fff;
+      font-size: 52px; line-height: 1; color: #fff;
     }
-    .card-pct-label { font-size: 15px; color: rgba(255,255,255,.8); margin-top: 4px; }
+    .card-pct-label { font-size: 14px; color: rgba(255,255,255,.8); margin-top: 4px; }
 
-    .card-animal { font-size: 44px; margin-bottom: 6px; }
+    /* good/bad summary row on card */
+    .card-stats {
+      display: flex; gap: 10px; margin-bottom: 14px;
+    }
+    .cs-pill {
+      font-size: 12px; padding: 4px 12px; border-radius: 100px;
+      background: rgba(255,255,255,.18); color: rgba(255,255,255,.9);
+      border: 1px solid rgba(255,255,255,.3);
+    }
+
+    .card-animal { font-size: 40px; margin-bottom: 5px; }
     .card-animal-name {
       font-family: 'Black Han Sans', sans-serif;
-      font-size: 22px; color: #fff; text-align: center; margin-bottom: 12px;
+      font-size: 21px; color: #fff; text-align: center; margin-bottom: 10px;
     }
     .card-desc {
-      font-size: 13px; color: rgba(255,255,255,.82);
-      text-align: center; line-height: 1.65; margin-bottom: 16px;
+      font-size: 12.5px; color: rgba(255,255,255,.82);
+      text-align: center; line-height: 1.65; margin-bottom: 14px;
       max-width: 300px;
     }
     .card-badge {
       background: rgba(255,255,255,.22);
       border: 1px solid rgba(255,255,255,.4);
-      border-radius: 100px; padding: 7px 18px;
-      font-size: 13px; color: #fff; margin-bottom: 14px;
+      border-radius: 100px; padding: 6px 16px;
+      font-size: 13px; color: #fff; margin-bottom: 12px;
     }
     .card-quip {
       font-size: 12px; color: rgba(255,255,255,.65);
@@ -375,7 +433,7 @@
       <p class="intro-sub">매일 달라지는 15문항으로<br>오늘의 인간 지수를 측정해보세요</p>
       <div class="date-badge" id="intro-date">로딩 중...</div>
       <button class="btn-start" id="btn-start">테스트 시작 →</button>
-      <p class="intro-note">📅 매일 새 문항 · 결과 이미지 저장 가능</p>
+      <p class="intro-note">📅 매일 새 문항 · 좋은 행동은 올리고 나쁜 행동은 내립니다</p>
     </div>
   </div>
 
@@ -387,8 +445,11 @@
     </div>
     <div class="progress-bar-wrap">
       <div class="progress-top">
-        <span>체크 항목</span>
-        <span class="progress-num"><span id="checked-count">0</span>/15</span>
+        <span class="progress-left">현재 인간 지수</span>
+        <div class="progress-right">
+          <span class="live-score-badge" id="live-score">50%</span>
+          <span class="checked-badge"><span id="checked-count">0</span>/15</span>
+        </div>
       </div>
       <div class="progress-track">
         <div class="progress-fill" id="progress-fill"></div>
@@ -406,6 +467,10 @@
       <div class="result-label">오늘 당신은</div>
       <div class="result-big-pct"><span id="anim-pct">0</span>%</div>
       <div class="result-human">인간이었습니다</div>
+      <div class="result-breakdown">
+        <span class="rb-good" id="rb-good"></span>
+        <span class="rb-bad" id="rb-bad"></span>
+      </div>
     </div>
 
     <div class="card-wrap" id="card-wrap">
@@ -421,14 +486,18 @@
             <div class="card-app-name">오늘 나는 몇 % 인간인가</div>
           </div>
           <div class="card-circle-wrap">
-            <svg class="card-circle-svg" viewBox="0 0 190 190">
-              <circle class="c-bg" cx="95" cy="95" r="76"/>
-              <circle class="c-prog" id="c-prog" cx="95" cy="95" r="76"/>
+            <svg class="card-circle-svg" viewBox="0 0 186 186">
+              <circle class="c-bg" cx="93" cy="93" r="74"/>
+              <circle class="c-prog" id="c-prog" cx="93" cy="93" r="74"/>
             </svg>
             <div class="card-circle-center">
               <div class="card-pct" id="card-pct">0</div>
               <div class="card-pct-label">% 인간</div>
             </div>
+          </div>
+          <div class="card-stats" id="card-stats">
+            <span class="cs-pill" id="cs-good"></span>
+            <span class="cs-pill" id="cs-bad"></span>
           </div>
           <div class="card-animal" id="card-animal-emoji"></div>
           <div class="card-animal-name" id="card-animal-name"></div>
@@ -461,77 +530,128 @@ const CATS = {
   social:  { icon: '👥', name: '사회생활',    color: '#fd79a8' },
 };
 
+// weight = 점수 크기. bad: 높을수록 더 인간 아님. good: 높을수록 더 인간적.
 const ITEMS = {
-  sleep: [
-    '알람을 3번 이상 껐다',
-    '누운 채로 폰을 1시간 이상 봤다',
-    '이불 밖으로 나오는 데 30분 이상 걸렸다',
-    '낮잠을 자다 밤을 맞이할 뻔했다',
-    '오늘 샤워를 안 했다',
-    '밥 먹고 바로 드러누웠다',
-    '해야 할 일을 내일로 미뤘다',
-    '"5분만 더"를 3번 이상 반복했다',
-    '소파나 침대에서 5시간 이상 보냈다',
-    '오후 2시 이후에 일어났다',
-    '계획한 일의 절반도 못 했다',
-    '아무 이유 없이 30분 이상 멍 때렸다',
-  ],
-  food: [
-    '물을 500ml도 안 마셨다',
-    '배달 음식을 시켜 먹었다',
-    '한 끼를 굶거나 폭식으로 대신했다',
-    '편의점 음식으로 끼니를 때웠다',
-    '자기 전 야식을 먹었다',
-    '채소를 한 입도 먹지 않았다',
-    '커피나 에너지 드링크를 3잔 이상 마셨다',
-    '과자나 사탕을 한 봉지 이상 먹었다',
-    '밥 먹으면서 유튜브나 드라마를 봤다',
-    '탄산음료를 마셨다',
-    '밥 대신 간식으로 끼니를 때웠다',
-    '냉장고를 5번 이상 열었다 그냥 닫았다',
-  ],
-  digital: [
-    '유튜브 쇼츠를 30분 이상 봤다',
-    '알림 확인을 10번 이상 했다',
-    'SNS 피드를 30분 이상 스크롤했다',
-    '넷플릭스나 OTT를 2시간 이상 봤다',
-    '화장실에서 폰을 봤다',
-    '폰 없이 10분도 못 버텼다',
-    '자려다 폰 보느라 1시간 이상 넘겼다',
-    '게임을 2시간 이상 했다',
-    '유튜브 알고리즘에 끌려다녔다',
-    '같은 영상이나 게시물을 두 번 봤다',
-    '스크린 타임이 5시간을 넘었다',
-    '배터리가 닳아 하루에 2번 이상 충전했다',
-  ],
-  health: [
-    '햇빛을 10분도 못 봤다',
-    '하루종일 앉아서만 보냈다',
-    '걸음수가 1000보 미만이다',
-    '운동하려다 "내일부터"로 바꿨다',
-    '자세가 하루 내내 구부정했다',
-    '물보다 카페인 음료를 더 많이 마셨다',
-    '숨이 차는 활동을 전혀 안 했다',
-    '눈이 충혈되거나 심하게 뻑뻑했다',
-    '스트레칭조차 하지 않았다',
-    '계단 대신 엘리베이터를 탔다',
-    '두통이나 피로를 느꼈지만 그냥 버텼다',
-    '신선한 공기를 한 번도 마시지 않았다',
-  ],
-  social: [
-    '누군가한테 짜증을 냈다',
-    '연락을 의도적으로 씹었다',
-    '약속을 미루거나 취소했다',
-    '오늘 사람을 한 명도 안 만났다',
-    '대화 대신 문자로만 해결했다',
-    '부탁을 거절하고 죄책감을 느꼈다',
-    '모임에 억지로 나가거나 억지로 안 나갔다',
-    'SNS에서 누군가가 부러웠다',
-    '혼자서 밥을 먹었다',
-    '감사 인사를 제대로 못 했다',
-    '위로받고 싶었지만 말을 못 했다',
-    '다른 사람 때문에 기분이 상했다',
-  ],
+  sleep: {
+    bad: [
+      { text: '알람을 3번 이상 껐다',           weight: 3 },
+      { text: '누운 채로 폰을 1시간 이상 봤다',  weight: 4 },
+      { text: '이불 밖으로 나오는 데 30분 이상 걸렸다', weight: 3 },
+      { text: '낮잠을 자다 밤을 맞이할 뻔했다',  weight: 6 },
+      { text: '오늘 샤워를 안 했다',             weight: 7 },
+      { text: '밥 먹고 바로 드러누웠다',         weight: 4 },
+      { text: '해야 할 일을 내일로 미뤘다',      weight: 5 },
+      { text: '"5분만 더"를 3번 이상 반복했다',  weight: 3 },
+      { text: '소파나 침대에서 5시간 이상 보냈다', weight: 6 },
+      { text: '오후 2시 이후에 일어났다',        weight: 7 },
+      { text: '계획한 일의 절반도 못 했다',      weight: 5 },
+      { text: '아무 이유 없이 30분 이상 멍 때렸다', weight: 2 },
+    ],
+    good: [
+      { text: '7시간 이상 깊게 잠을 잤다',         weight: 8 },
+      { text: '알람을 한 번에 끄고 바로 일어났다',  weight: 6 },
+      { text: '계획한 일 하나 이상을 완수했다',     weight: 7 },
+      { text: '자정 전에 잠자리에 들었다',         weight: 6 },
+      { text: '하루를 개운하게 시작했다',          weight: 5 },
+      { text: '오늘 할 일 목록을 작성하고 실행했다', weight: 7 },
+    ],
+  },
+  food: {
+    bad: [
+      { text: '물을 500ml도 안 마셨다',                weight: 6 },
+      { text: '배달 음식을 시켜 먹었다',               weight: 3 },
+      { text: '한 끼를 굶거나 폭식으로 대신했다',      weight: 6 },
+      { text: '편의점 음식으로 끼니를 때웠다',         weight: 3 },
+      { text: '자기 전 야식을 먹었다',                weight: 5 },
+      { text: '채소를 한 입도 먹지 않았다',           weight: 5 },
+      { text: '커피나 에너지 드링크를 3잔 이상 마셨다', weight: 4 },
+      { text: '과자나 사탕을 한 봉지 이상 먹었다',    weight: 3 },
+      { text: '밥 먹으면서 유튜브나 드라마를 봤다',   weight: 2 },
+      { text: '탄산음료를 마셨다',                    weight: 2 },
+      { text: '밥 대신 간식으로 끼니를 때웠다',       weight: 4 },
+      { text: '냉장고를 5번 이상 열었다 그냥 닫았다', weight: 2 },
+    ],
+    good: [
+      { text: '물을 2L 이상 마셨다',            weight: 9 },
+      { text: '채소를 두 가지 이상 먹었다',      weight: 7 },
+      { text: '집밥이나 균형 잡힌 식사를 했다',  weight: 6 },
+      { text: '식사를 천천히 즐기며 먹었다',     weight: 5 },
+      { text: '야식 없이 하루를 마무리했다',     weight: 6 },
+      { text: '하루 세 끼를 제때 챙겨 먹었다',  weight: 7 },
+    ],
+  },
+  digital: {
+    bad: [
+      { text: '유튜브 쇼츠를 30분 이상 봤다',      weight: 4 },
+      { text: '알림 확인을 10번 이상 했다',         weight: 3 },
+      { text: 'SNS 피드를 30분 이상 스크롤했다',   weight: 4 },
+      { text: '넷플릭스나 OTT를 2시간 이상 봤다',  weight: 4 },
+      { text: '화장실에서 폰을 봤다',              weight: 2 },
+      { text: '폰 없이 10분도 못 버텼다',          weight: 5 },
+      { text: '자려다 폰 보느라 1시간 이상 넘겼다', weight: 7 },
+      { text: '게임을 2시간 이상 했다',            weight: 4 },
+      { text: '유튜브 알고리즘에 끌려다녔다',      weight: 3 },
+      { text: '같은 영상이나 게시물을 두 번 봤다', weight: 2 },
+      { text: '스크린 타임이 5시간을 넘었다',      weight: 8 },
+      { text: '배터리가 닳아 하루에 2번 이상 충전했다', weight: 4 },
+    ],
+    good: [
+      { text: '의도적으로 폰을 1시간 이상 내려놨다', weight: 9 },
+      { text: '스크린 타임이 3시간 미만이었다',      weight: 9 },
+      { text: '아침에 SNS 대신 다른 걸 먼저 했다',  weight: 7 },
+      { text: '불필요한 앱 알림을 껐다',            weight: 5 },
+      { text: '식사 중 폰을 내려놨다',              weight: 6 },
+      { text: '잠들기 1시간 전부터 폰을 내려놨다',  weight: 8 },
+    ],
+  },
+  health: {
+    bad: [
+      { text: '햇빛을 10분도 못 봤다',                weight: 5 },
+      { text: '하루종일 앉아서만 보냈다',              weight: 7 },
+      { text: '걸음수가 1000보 미만이다',              weight: 8 },
+      { text: '운동하려다 "내일부터"로 바꿨다',        weight: 5 },
+      { text: '자세가 하루 내내 구부정했다',           weight: 4 },
+      { text: '물보다 카페인 음료를 더 많이 마셨다',   weight: 4 },
+      { text: '숨이 차는 활동을 전혀 안 했다',        weight: 6 },
+      { text: '눈이 충혈되거나 심하게 뻑뻑했다',      weight: 3 },
+      { text: '스트레칭조차 하지 않았다',             weight: 4 },
+      { text: '계단 대신 엘리베이터를 탔다',          weight: 2 },
+      { text: '두통이나 피로를 느꼈지만 그냥 버텼다', weight: 3 },
+      { text: '신선한 공기를 한 번도 마시지 않았다',  weight: 5 },
+    ],
+    good: [
+      { text: '30분 이상 걸었다',                  weight: 9 },
+      { text: '햇빛을 10분 이상 쬐었다',           weight: 8 },
+      { text: '스트레칭이나 가벼운 운동을 했다',    weight: 8 },
+      { text: '의식적으로 계단을 이용했다',         weight: 5 },
+      { text: '신선한 공기를 마시러 잠깐 나갔다',   weight: 7 },
+      { text: '규칙적인 시간에 식사와 수면을 지켰다', weight: 6 },
+    ],
+  },
+  social: {
+    bad: [
+      { text: '누군가한테 짜증을 냈다',              weight: 6 },
+      { text: '연락을 의도적으로 씹었다',            weight: 6 },
+      { text: '약속을 미루거나 취소했다',            weight: 5 },
+      { text: '오늘 사람을 한 명도 안 만났다',       weight: 3 },
+      { text: '대화 대신 문자로만 해결했다',         weight: 2 },
+      { text: '부탁을 거절하고 죄책감을 느꼈다',     weight: 2 },
+      { text: '모임에 억지로 나가거나 억지로 안 나갔다', weight: 3 },
+      { text: 'SNS에서 누군가가 부러웠다',           weight: 2 },
+      { text: '혼자서 밥을 먹었다',                 weight: 1 },
+      { text: '감사 인사를 제대로 못 했다',          weight: 4 },
+      { text: '위로받고 싶었지만 말을 못 했다',      weight: 4 },
+      { text: '다른 사람 때문에 기분이 상했다',      weight: 4 },
+    ],
+    good: [
+      { text: '진심으로 감사 인사를 전했다',      weight: 8 },
+      { text: '누군가의 말을 끝까지 경청했다',    weight: 7 },
+      { text: '먼저 연락을 했다',                weight: 6 },
+      { text: '누군가를 직접 만났다',            weight: 7 },
+      { text: '칭찬이나 격려의 말을 전했다',     weight: 7 },
+      { text: '약속을 지켰다',                  weight: 6 },
+    ],
+  },
 };
 
 const RANGES = [
@@ -608,13 +728,17 @@ function todaysSeed() {
   return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
 }
 
+// 카테고리당 bad 2개 + good 1개 = 15문항
 function getTodaysItems() {
   const rand = mkRand(todaysSeed());
   const catKeys = Object.keys(ITEMS);
   const picked = [];
   for (const cat of catKeys) {
-    const shuffled = shuffle(ITEMS[cat], rand);
-    for (let i = 0; i < 3; i++) picked.push({ cat, text: shuffled[i] });
+    const sb = shuffle(ITEMS[cat].bad, rand);
+    const sg = shuffle(ITEMS[cat].good, rand);
+    picked.push({ cat, type: 'bad',  text: sb[0].text, weight: sb[0].weight });
+    picked.push({ cat, type: 'bad',  text: sb[1].text, weight: sb[1].weight });
+    picked.push({ cat, type: 'good', text: sg[0].text, weight: sg[0].weight });
   }
   return shuffle(picked, rand);
 }
@@ -639,6 +763,20 @@ function p2(n) { return String(n).padStart(2, '0'); }
 let todaysItems = [];
 let checked = new Set();
 let score = 0;
+
+// ═══════════════════════════════════════
+// SCORE CALC
+// ═══════════════════════════════════════
+// 기준: 50점. good 체크 시 +weight, bad 체크 시 -weight. 0~100 클램프.
+function calcScore() {
+  let gp = 0, bp = 0;
+  checked.forEach(idx => {
+    const item = todaysItems[idx];
+    if (item.type === 'good') gp += item.weight;
+    else bp += item.weight;
+  });
+  return { score: Math.min(100, Math.max(0, 50 + gp - bp)), gp, bp };
+}
 
 // ═══════════════════════════════════════
 // HELPERS
@@ -667,6 +805,13 @@ function animNum(from, to, ms, cb) {
   requestAnimationFrame(step);
 }
 
+function scoreColor(s) {
+  if (s < 30) return '#ef4444';
+  if (s < 50) return '#f97316';
+  if (s < 70) return '#a29bfe';
+  return '#00cec9';
+}
+
 // ═══════════════════════════════════════
 // RENDER
 // ═══════════════════════════════════════
@@ -676,13 +821,18 @@ function renderItems() {
   todaysItems.forEach((item, idx) => {
     const cat = CATS[item.cat];
     const isChecked = checked.has(idx);
+    const isGood = item.type === 'good';
+    const scoreLabel = isGood ? `+${item.weight}` : `-${item.weight}`;
+    const scoreClass = isGood ? 'score-good' : 'score-bad';
+
     const card = document.createElement('div');
-    card.className = `item-card cat-${item.cat}${isChecked ? ' checked' : ''}`;
+    card.className = `item-card cat-${item.cat} type-${item.type}${isChecked ? ' checked' : ''}`;
     card.dataset.idx = idx;
     card.innerHTML = `
       <div class="checkbox"><span class="check-mark">✓</span></div>
       <span class="cat-icon">${cat.icon}</span>
-      <span class="item-text">${item.text}</span>`;
+      <span class="item-text">${item.text}</span>
+      <span class="item-score ${scoreClass}">${scoreLabel}</span>`;
     card.addEventListener('click', () => toggle(idx));
     list.appendChild(card);
   });
@@ -698,20 +848,37 @@ function toggle(idx) {
 
 function updateProgress() {
   const n = checked.size;
+  const { score: s } = calcScore();
+  const col = scoreColor(s);
+
   document.getElementById('checked-count').textContent = n;
-  document.getElementById('progress-fill').style.width = `${(n / 15) * 100}%`;
+  document.getElementById('live-score').textContent = `${s}%`;
+  document.getElementById('live-score').style.color = col;
+  document.getElementById('progress-fill').style.width = `${s}%`;
+  document.getElementById('progress-fill').style.backgroundColor = col;
 }
 
 // ═══════════════════════════════════════
 // RESULT
 // ═══════════════════════════════════════
 function showResult() {
-  score = Math.round(((15 - checked.size) / 15) * 100);
+  const { score: s, gp, bp } = calcScore();
+  score = s;
 
+  // 최다 체크 bad 카테고리
   const catCounts = { sleep: 0, food: 0, digital: 0, health: 0, social: 0 };
-  checked.forEach(idx => catCounts[todaysItems[idx].cat]++);
+  checked.forEach(idx => {
+    if (todaysItems[idx].type === 'bad') catCounts[todaysItems[idx].cat]++;
+  });
   let domCat = Object.keys(catCounts).reduce((a, b) => catCounts[a] >= catCounts[b] ? a : b);
   const noDom = catCounts[domCat] === 0;
+
+  // good 체크 수
+  let goodCnt = 0, badCnt = 0;
+  checked.forEach(idx => {
+    if (todaysItems[idx].type === 'good') goodCnt++;
+    else badCnt++;
+  });
 
   const ri = Math.min(Math.floor(score / 10), 9);
   const range = RANGES[ri];
@@ -721,14 +888,22 @@ function showResult() {
 
   showScreen('screen-result');
 
+  // 애니메이션
   animNum(0, score, 1300, n => {
     document.getElementById('anim-pct').textContent = n;
   });
 
+  // 결과 상단 breakdown
+  document.getElementById('rb-good').textContent = `✅ 좋은 행동 ${goodCnt}개 (+${gp}점)`;
+  document.getElementById('rb-bad').textContent  = `❌ 나쁜 행동 ${badCnt}개 (-${bp}점)`;
+
+  // 카드
   document.getElementById('card-date-str').textContent = shortDateStr();
   document.getElementById('card-pct').textContent = score;
   document.getElementById('card-animal-emoji').textContent = range.emoji;
   document.getElementById('card-animal-name').textContent = range.name;
+  document.getElementById('cs-good').textContent = `✅ +${gp}`;
+  document.getElementById('cs-bad').textContent  = `❌ -${bp}`;
 
   if (noDom) {
     document.getElementById('card-desc').textContent = `${range.desc}.`;
@@ -745,7 +920,7 @@ function showResult() {
   scaleCard();
 
   setTimeout(() => {
-    const circ = 2 * Math.PI * 76;
+    const circ = 2 * Math.PI * 74;  // r=74
     const offset = circ * (1 - score / 100);
     document.getElementById('c-prog').style.strokeDasharray = circ;
     document.getElementById('c-prog').style.strokeDashoffset = offset;
@@ -832,6 +1007,7 @@ function init() {
 
   todaysItems = getTodaysItems();
   renderItems();
+  updateProgress(); // 초기 50% 표시
 
   document.getElementById('btn-start').addEventListener('click', () => showScreen('screen-test'));
   document.getElementById('btn-result').addEventListener('click', showResult);
