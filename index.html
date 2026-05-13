@@ -831,8 +831,7 @@ function renderItems() {
     card.innerHTML = `
       <div class="checkbox"><span class="check-mark">✓</span></div>
       <span class="cat-icon">${cat.icon}</span>
-      <span class="item-text">${item.text}</span>
-      <span class="item-score ${scoreClass}">${scoreLabel}</span>`;
+      <span class="item-text">${item.text}</span>`;
     card.addEventListener('click', () => toggle(idx));
     list.appendChild(card);
   });
