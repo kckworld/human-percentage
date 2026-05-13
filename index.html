@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>오늘 나는 몇 % 인간인가</title>
+  <meta name="description" content="매일 달라지는 15문항으로 오늘의 인간 지수를 측정해보세요.">
+  <meta property="og:title" content="오늘 나는 몇 % 인간인가 🤔">
+  <meta property="og:description" content="매일 달라지는 15문항으로 오늘의 인간 지수를 측정해보세요.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://kckworld.github.io/human-percentage">
+  <meta property="og:image" content="https://kckworld.github.io/human-percentage/preview.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="오늘 나는 몇 % 인간인가 🤔">
+  <meta name="twitter:description" content="매일 달라지는 15문항으로 오늘의 인간 지수를 측정해보세요.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      font-family: 'Gowun Dodum', 'Noto Sans KR', sans-serif;
+      background: #0d0d1a;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      overflow-x: hidden;
+    }
+
+    #app {
+      width: 100%;
+      max-width: 390px;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    .screen { display: none; min-height: 100vh; flex-direction: column; }
+    .screen.active { display: flex; }
+
+    /* ─── INTRO ─── */
+    #screen-intro {
+      align-items: center;
+      justify-content: center;
+      padding: 48px 28px;
+      background: linear-gradient(160deg, #0d0d1a 0%, #1a0a2e 55%, #0d1422 100%);
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+    }
+    #screen-intro::before {
+      content: '';
+      position: absolute;
+      top: -120px; left: -120px;
+      width: 360px; height: 360px;
+      background: radial-gradient(circle, rgba(108,92,231,.28) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    #screen-intro::after {
+      content: '';
+      position: absolute;
+      bottom: -100px; right: -100px;
+      width: 320px; height: 320px;
+      background: radial-gradient(circle, rgba(253,121,168,.22) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .intro-z { position: relative; z-index: 1; width: 100%; }
+
+    .intro-icon {
+      font-size: 80px;
+      display: block;
+      margin-bottom: 28px;
+      animation: float 3.2s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+
+    .intro-title {
+      font-family: 'Black Han Sans', sans-serif;
+      font-size: 38px;
+      line-height: 1.2;
+      margin-bottom: 18px;
+      background: linear-gradient(135deg, #a29bfe 0%, #fd79a8 50%, #fdcb6e 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .intro-sub {
+      font-size: 15px;
+      color: rgba(255,255,255,.65);
+      line-height: 1.75;
+      margin-bottom: 28px;
+    }
+
+    .date-badge {
+      display: inline-block;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 100px;
+      padding: 9px 22px;
+      font-size: 14px;
+      color: rgba(255,255,255,.85);
+      margin-bottom: 36px;
+    }
+
+    .btn-start {
+      display: block; width: 100%;
+      background: linear-gradient(135deg, #6c5ce7, #fd79a8);
+      color: #fff; border: none; border-radius: 18px;
+      padding: 19px; margin-bottom: 18px;
+      font-family: 'Black Han Sans', sans-serif; font-size: 19px;
+      cursor: pointer; letter-spacing: .04em;
+      box-shadow: 0 10px 36px rgba(108,92,231,.42);
+      transition: transform .18s;
+    }
+    .btn-start:active { transform: scale(.97); }
+
+    .intro-note { font-size: 13px; color: rgba(255,255,255,.35); }
+
+    /* ─── TEST SCREEN ─── */
+    #screen-test { background: linear-gradient(180deg, #0d0d1a 0%, #12122a 100%); }
+
+    .test-header {
+      padding: 22px 20px 14px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      position: sticky; top: 0; z-index: 10;
+      background: rgba(13,13,26,.96);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .test-header-title {
+      font-family: 'Black Han Sans', sans-serif;
+      font-size: 17px; color: rgba(255,255,255,.9); margin-bottom: 3px;
+    }
+    .test-header-date { font-size: 12px; color: rgba(255,255,255,.45); }
+
+    .progress-bar-wrap { padding: 14px 20px 12px; border-bottom: 1px solid rgba(255,255,255,.05); }
+    .progress-top {
+      display: flex; justify-content: space-between; align-items: baseline;
+      margin-bottom: 8px; font-size: 13px; color: rgba(255,255,255,.55);
+    }
+    .progress-num {
+      font-family: 'Black Han Sans', sans-serif;
+      font-size: 17px; color: #a29bfe;
+    }
+    .progress-track {
+      height: 5px; background: rgba(255,255,255,.1);
+      border-radius: 100px; overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #6c5ce7, #fd79a8);
+      border-radius: 100px; width: 0%; transition: width .3s ease;
+    }
+
+    .items-list { flex: 1; overflow-y: auto; padding: 12px 16px 120px; }
+
+    .item-card {
+      display: flex; align-items: center; gap: 12px;
+      padding: 13px 15px; border-radius: 14px; margin-bottom: 9px;
+      background: rgba(255,255,255,.05);
+      border: 1.5px solid rgba(255,255,255,.07);
+      cursor: pointer; transition: all .22s ease;
+      user-select: none; -webkit-user-select: none;
+    }
+    .item-card:active { transform: scale(.97); }
+
+    .item-card.cat-sleep  { --cc: #6c5ce7; --cg: rgba(108,92,231,.18); }
+    .item-card.cat-food   { --cc: #e17055; --cg: rgba(225,112,85,.18); }
+    .item-card.cat-digital{ --cc: #0984e3; --cg: rgba(9,132,227,.18); }
+    .item-card.cat-health { --cc: #00b894; --cg: rgba(0,184,148,.18); }
+    .item-card.cat-social { --cc: #fd79a8; --cg: rgba(253,121,168,.18); }
+
+    .item-card.checked {
+      background: var(--cg);
+      border-color: var(--cc);
+    }
+
+    .checkbox {
+      width: 26px; height: 26px; border-radius: 8px;
+      border: 2px solid rgba(255,255,255,.28);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: all .2s ease;
+    }
+    .item-card.checked .checkbox {
+      background: var(--cc); border-color: var(--cc);
+    }
+    .check-mark {
+      font-size: 13px; font-weight: 900; color: #fff;
+      opacity: 0; transform: scale(0) rotate(-10deg);
+      transition: all .2s cubic-bezier(.34,1.56,.64,1);
+    }
+    .item-card.checked .check-mark { opacity: 1; transform: scale(1) rotate(0); }
+
+    .cat-icon { font-size: 17px; flex-shrink: 0; }
+    .item-text { font-size: 14px; line-height: 1.5; color: rgba(255,255,255,.8); flex: 1; }
+    .item-card.checked .item-text { color: #fff; }
+
+    .test-footer {
+      position: fixed; bottom: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 100%; max-width: 390px;
+      padding: 14px 20px 34px;
+      background: linear-gradient(180deg, transparent 0%, #12122a 36%);
+      pointer-events: none;
+    }
+    .btn-result {
+      display: block; width: 100%; pointer-events: all;
+      background: linear-gradient(135deg, #6c5ce7, #fd79a8);
+      color: #fff; border: none; border-radius: 18px;
+      padding: 18px; font-family: 'Black Han Sans', sans-serif;
+      font-size: 18px; cursor: pointer; letter-spacing: .04em;
+      box-shadow: 0 8px 32px rgba(108,92,231,.5);
+      transition: transform .18s;
+    }
+    .btn-result:active { transform: scale(.97); }
+
+    /* ─── RESULT SCREEN ─── */
+    #screen-result { background: #0d0d1a; overflow-y: auto; }
+
+    .result-top { padding: 40px 28px 8px; text-align: center; }
+    .result-label { font-size: 15px; color: rgba(255,255,255,.55); margin-bottom: 6px; }
+    .result-big-pct {
+      font-family: 'Black Han Sans', sans-serif; font-size: 88px; line-height: 1;
+      margin-bottom: 4px;
+      background: linear-gradient(135deg, #a29bfe, #fd79a8);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .result-human { font-size: 18px; color: rgba(255,255,255,.75); margin-bottom: 32px; }
+
+    /* ─── CARD ─── */
+    .card-wrap {
+      width: 100%; max-width: 390px; margin: 0 auto;
+      padding: 0 0 2px; overflow: hidden;
+      transform-origin: top center;
+    }
+    #result-card {
+      width: 390px; height: 693px; position: relative; overflow: hidden;
+      flex-shrink: 0;
+    }
+    .card-bg { position: absolute; inset: 0; z-index: 0; }
+    .card-deco-1 {
+      position: absolute; top: -80px; right: -80px;
+      width: 260px; height: 260px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,.18) 0%, transparent 70%);
+    }
+    .card-deco-2 {
+      position: absolute; bottom: -60px; left: -60px;
+      width: 220px; height: 220px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,.12) 0%, transparent 70%);
+    }
+    .card-deco-3 {
+      position: absolute; top: 50%; left: -40px;
+      width: 160px; height: 160px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,.07) 0%, transparent 70%);
+      transform: translateY(-50%);
+    }
+
+    .card-inner {
+      position: relative; z-index: 1;
+      height: 100%; display: flex; flex-direction: column;
+      align-items: center; padding: 40px 28px 28px;
+    }
+
+    .card-top { text-align: center; margin-bottom: 20px; }
+    .card-date-str { font-size: 13px; color: rgba(255,255,255,.7); margin-bottom: 5px; }
+    .card-app-name {
+      font-family: 'Black Han Sans', sans-serif;
+      font-size: 16px; color: rgba(255,255,255,.95); letter-spacing: .05em;
+    }
+
+    .card-circle-wrap {
+      position: relative; width: 190px; height: 190px;
+      margin-bottom: 18px; flex-shrink: 0;
+    }
+    .card-circle-svg { width: 190px; height: 190px; transform: rotate(-90deg); }
+    .c-bg { fill: none; stroke: rgba(255,255,255,.18); stroke-width: 11; }
+    .c-prog {
+      fill: none; stroke: rgba(255,255,255,.95); stroke-width: 11;
+      stroke-linecap: round;
+      stroke-dasharray: 477.52; stroke-dashoffset: 477.52;
+      transition: stroke-dashoffset 1.6s cubic-bezier(.16,1,.3,1);
+    }
+    .card-circle-center {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+    .card-pct {
+      font-family: 'Black Han Sans', sans-serif;
+      font-size: 54px; line-height: 1; color: #fff;
+    }
+    .card-pct-label { font-size: 15px; color: rgba(255,255,255,.8); margin-top: 4px; }
+
+    .card-animal { font-size: 44px; margin-bottom: 6px; }
+    .card-animal-name {
+      font-family: 'Black Han Sans', sans-serif;
+      font-size: 22px; color: #fff; text-align: center; margin-bottom: 12px;
+    }
+    .card-desc {
+      font-size: 13px; color: rgba(255,255,255,.82);
+      text-align: center; line-height: 1.65; margin-bottom: 16px;
+      max-width: 300px;
+    }
+    .card-badge {
+      background: rgba(255,255,255,.22);
+      border: 1px solid rgba(255,255,255,.4);
+      border-radius: 100px; padding: 7px 18px;
+      font-size: 13px; color: #fff; margin-bottom: 14px;
+    }
+    .card-quip {
+      font-size: 12px; color: rgba(255,255,255,.65);
+      text-align: center; font-style: italic;
+      line-height: 1.5;
+    }
+    .card-url {
+      position: absolute; bottom: 20px; left: 0; right: 0;
+      text-align: center; font-size: 11px;
+      color: rgba(255,255,255,.35); letter-spacing: .08em;
+    }
+
+    /* ─── RESULT ACTIONS ─── */
+    .result-actions { display: flex; gap: 12px; padding: 24px 20px 48px; }
+    .btn-save {
+      flex: 1;
+      background: linear-gradient(135deg, #6c5ce7, #fd79a8);
+      color: #fff; border: none; border-radius: 16px;
+      padding: 17px; font-family: 'Black Han Sans', sans-serif;
+      font-size: 16px; cursor: pointer; letter-spacing: .03em;
+      box-shadow: 0 6px 24px rgba(108,92,231,.42);
+      transition: transform .18s;
+    }
+    .btn-save:active { transform: scale(.97); }
+    .btn-save:disabled { opacity: .6; }
+    .btn-retry {
+      flex: 0 0 auto;
+      background: rgba(255,255,255,.09);
+      color: rgba(255,255,255,.8);
+      border: 1.5px solid rgba(255,255,255,.18);
+      border-radius: 16px; padding: 17px 22px;
+      font-family: 'Black Han Sans', sans-serif;
+      font-size: 16px; cursor: pointer;
+      transition: transform .18s;
+    }
+    .btn-retry:active { transform: scale(.97); }
+
+    /* ─── TOAST ─── */
+    .toast {
+      position: fixed; bottom: 90px; left: 50%;
+      transform: translateX(-50%) translateY(16px);
+      background: rgba(10,10,20,.9);
+      border: 1px solid rgba(255,255,255,.15);
+      color: #fff; padding: 12px 28px;
+      border-radius: 100px; font-size: 14px;
+      opacity: 0; transition: all .3s ease; z-index: 1000;
+      white-space: nowrap;
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ── INTRO ── -->
+  <div id="screen-intro" class="screen active">
+    <div class="intro-z">
+      <span class="intro-icon">🤔</span>
+      <h1 class="intro-title">오늘 나는<br>몇 % 인간인가</h1>
+      <p class="intro-sub">매일 달라지는 15문항으로<br>오늘의 인간 지수를 측정해보세요</p>
+      <div class="date-badge" id="intro-date">로딩 중...</div>
+      <button class="btn-start" id="btn-start">테스트 시작 →</button>
+      <p class="intro-note">📅 매일 새 문항 · 결과 이미지 저장 가능</p>
+    </div>
+  </div>
+
+  <!-- ── TEST ── -->
+  <div id="screen-test" class="screen">
+    <div class="test-header">
+      <div class="test-header-title">오늘의 인간성 테스트</div>
+      <div class="test-header-date" id="test-date-display"></div>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-top">
+        <span>체크 항목</span>
+        <span class="progress-num"><span id="checked-count">0</span>/15</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+    </div>
+    <div class="items-list" id="items-list"></div>
+    <div class="test-footer">
+      <button class="btn-result" id="btn-result">결과 보기 →</button>
+    </div>
+  </div>
+
+  <!-- ── RESULT ── -->
+  <div id="screen-result" class="screen">
+    <div class="result-top">
+      <div class="result-label">오늘 당신은</div>
+      <div class="result-big-pct"><span id="anim-pct">0</span>%</div>
+      <div class="result-human">인간이었습니다</div>
+    </div>
+
+    <div class="card-wrap" id="card-wrap">
+      <div id="result-card">
+        <div class="card-bg" id="card-bg">
+          <div class="card-deco-1"></div>
+          <div class="card-deco-2"></div>
+          <div class="card-deco-3"></div>
+        </div>
+        <div class="card-inner">
+          <div class="card-top">
+            <div class="card-date-str" id="card-date-str"></div>
+            <div class="card-app-name">오늘 나는 몇 % 인간인가</div>
+          </div>
+          <div class="card-circle-wrap">
+            <svg class="card-circle-svg" viewBox="0 0 190 190">
+              <circle class="c-bg" cx="95" cy="95" r="76"/>
+              <circle class="c-prog" id="c-prog" cx="95" cy="95" r="76"/>
+            </svg>
+            <div class="card-circle-center">
+              <div class="card-pct" id="card-pct">0</div>
+              <div class="card-pct-label">% 인간</div>
+            </div>
+          </div>
+          <div class="card-animal" id="card-animal-emoji"></div>
+          <div class="card-animal-name" id="card-animal-name"></div>
+          <div class="card-desc" id="card-desc"></div>
+          <div class="card-badge" id="card-badge"></div>
+          <div class="card-quip" id="card-quip"></div>
+          <div class="card-url">kckworld.github.io/human-percentage</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="result-actions">
+      <button class="btn-save" id="btn-save">💾 이미지 저장</button>
+      <button class="btn-retry" id="btn-retry">🔄 다시</button>
+    </div>
+  </div>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════
+const CATS = {
+  sleep:   { icon: '😴', name: '수면/게으름', color: '#6c5ce7' },
+  food:    { icon: '🍔', name: '식습관',      color: '#e17055' },
+  digital: { icon: '📱', name: '디지털 중독', color: '#0984e3' },
+  health:  { icon: '💪', name: '건강/운동',   color: '#00b894' },
+  social:  { icon: '👥', name: '사회생활',    color: '#fd79a8' },
+};
+
+const ITEMS = {
+  sleep: [
+    '알람을 3번 이상 껐다',
+    '누운 채로 폰을 1시간 이상 봤다',
+    '이불 밖으로 나오는 데 30분 이상 걸렸다',
+    '낮잠을 자다 밤을 맞이할 뻔했다',
+    '오늘 샤워를 안 했다',
+    '밥 먹고 바로 드러누웠다',
+    '해야 할 일을 내일로 미뤘다',
+    '"5분만 더"를 3번 이상 반복했다',
+    '소파나 침대에서 5시간 이상 보냈다',
+    '오후 2시 이후에 일어났다',
+    '계획한 일의 절반도 못 했다',
+    '아무 이유 없이 30분 이상 멍 때렸다',
+  ],
+  food: [
+    '물을 500ml도 안 마셨다',
+    '배달 음식을 시켜 먹었다',
+    '한 끼를 굶거나 폭식으로 대신했다',
+    '편의점 음식으로 끼니를 때웠다',
+    '자기 전 야식을 먹었다',
+    '채소를 한 입도 먹지 않았다',
+    '커피나 에너지 드링크를 3잔 이상 마셨다',
+    '과자나 사탕을 한 봉지 이상 먹었다',
+    '밥 먹으면서 유튜브나 드라마를 봤다',
+    '탄산음료를 마셨다',
+    '밥 대신 간식으로 끼니를 때웠다',
+    '냉장고를 5번 이상 열었다 그냥 닫았다',
+  ],
+  digital: [
+    '유튜브 쇼츠를 30분 이상 봤다',
+    '알림 확인을 10번 이상 했다',
+    'SNS 피드를 30분 이상 스크롤했다',
+    '넷플릭스나 OTT를 2시간 이상 봤다',
+    '화장실에서 폰을 봤다',
+    '폰 없이 10분도 못 버텼다',
+    '자려다 폰 보느라 1시간 이상 넘겼다',
+    '게임을 2시간 이상 했다',
+    '유튜브 알고리즘에 끌려다녔다',
+    '같은 영상이나 게시물을 두 번 봤다',
+    '스크린 타임이 5시간을 넘었다',
+    '배터리가 닳아 하루에 2번 이상 충전했다',
+  ],
+  health: [
+    '햇빛을 10분도 못 봤다',
+    '하루종일 앉아서만 보냈다',
+    '걸음수가 1000보 미만이다',
+    '운동하려다 "내일부터"로 바꿨다',
+    '자세가 하루 내내 구부정했다',
+    '물보다 카페인 음료를 더 많이 마셨다',
+    '숨이 차는 활동을 전혀 안 했다',
+    '눈이 충혈되거나 심하게 뻑뻑했다',
+    '스트레칭조차 하지 않았다',
+    '계단 대신 엘리베이터를 탔다',
+    '두통이나 피로를 느꼈지만 그냥 버텼다',
+    '신선한 공기를 한 번도 마시지 않았다',
+  ],
+  social: [
+    '누군가한테 짜증을 냈다',
+    '연락을 의도적으로 씹었다',
+    '약속을 미루거나 취소했다',
+    '오늘 사람을 한 명도 안 만났다',
+    '대화 대신 문자로만 해결했다',
+    '부탁을 거절하고 죄책감을 느꼈다',
+    '모임에 억지로 나가거나 억지로 안 나갔다',
+    'SNS에서 누군가가 부러웠다',
+    '혼자서 밥을 먹었다',
+    '감사 인사를 제대로 못 했다',
+    '위로받고 싶었지만 말을 못 했다',
+    '다른 사람 때문에 기분이 상했다',
+  ],
+};
+
+const RANGES = [
+  { emoji: '🔌', name: '충전 중인 스마트폰',
+    desc: '오늘은 기계가 당신보다 더 인간적이었을 수 있습니다' },
+  { emoji: '🦥', name: '나무늘보',
+    desc: '생명 유지는 되었습니다. 그게 오늘의 전부였습니다' },
+  { emoji: '🐼', name: '야생 판다',
+    desc: '귀엽긴 한데 인간의 기능을 많이 잃은 상태입니다' },
+  { emoji: '🛋️', name: '소파와 합체된 존재',
+    desc: '인간과 가구의 중간 어딘가에 위치하고 있습니다' },
+  { emoji: '🐌', name: '달팽이',
+    desc: '느리지만 나름의 철학이 있는 하루였습니다' },
+  { emoji: '🐧', name: '펭귄',
+    desc: '평균은 됩니다. 그냥 좀 춥고 어색할 뿐입니다' },
+  { emoji: '🐕', name: '강아지',
+    desc: '충실하고 무해한 하루를 보냈습니다' },
+  { emoji: '🌿', name: '건강한 식물',
+    desc: '꾸준히 자라나는 중입니다. 잘 하고 있어요' },
+  { emoji: '🦁', name: '사자',
+    desc: '오늘 제법 제대로 살았습니다. 대단합니다' },
+  { emoji: '🧘', name: '깨달은 인간',
+    desc: '이 점수가 사실이라면 당신이 인간의 교과서입니다' },
+];
+
+const CAT_DESC = {
+  sleep:   '수면과 게으름이 주요 원인인',
+  food:    '식습관이 발목을 잡은',
+  digital: '디지털 기기에 점령당한',
+  health:  '건강 관리가 아쉬웠던',
+  social:  '사회생활이 삐걱거린',
+};
+
+const DAY_QUIPS = [
+  '일요일이라 그렇다 치겠습니다.',
+  '월요일부터 이러면 주중이 걱정됩니다.',
+  '화요일은 원래 이런 요일입니다.',
+  '수요일이니 그나마 중간은 왔습니다.',
+  '목요일... 거의 다 왔는데 왜 이럴까요.',
+  '금요일이라 이해합니다. 다들 그렇습니다.',
+  '토요일마저 이렇게 됐군요.',
+];
+
+const GRAD = [
+  ['#b91c1c','#7f1d1d'], ['#dc2626','#9a3412'],
+  ['#ea580c','#b45309'], ['#d97706','#92400e'],
+  ['#ca8a04','#854d0e'], ['#2563eb','#1e40af'],
+  ['#1d4ed8','#0e7490'], ['#0d9488','#065f46'],
+  ['#16a34a','#14532d'], ['#15803d','#166534'],
+];
+
+// ═══════════════════════════════════════
+// SEEDED RANDOM
+// ═══════════════════════════════════════
+function mkRand(seed) {
+  let s = seed | 0;
+  return () => {
+    s = (Math.imul(1664525, s) + 1013904223) | 0;
+    return (s >>> 0) / 4294967296;
+  };
+}
+
+function shuffle(arr, rand) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function todaysSeed() {
+  const d = new Date();
+  return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+}
+
+function getTodaysItems() {
+  const rand = mkRand(todaysSeed());
+  const catKeys = Object.keys(ITEMS);
+  const picked = [];
+  for (const cat of catKeys) {
+    const shuffled = shuffle(ITEMS[cat], rand);
+    for (let i = 0; i < 3; i++) picked.push({ cat, text: shuffled[i] });
+  }
+  return shuffle(picked, rand);
+}
+
+// ═══════════════════════════════════════
+// DATE HELPERS
+// ═══════════════════════════════════════
+const DAYS = ['일','월','화','수','목','금','토'];
+function dateStr() {
+  const d = new Date();
+  return `${d.getFullYear()}.${p2(d.getMonth()+1)}.${p2(d.getDate())} (${DAYS[d.getDay()]}요일)`;
+}
+function shortDateStr() {
+  const d = new Date();
+  return `${d.getMonth()+1}월 ${d.getDate()}일 ${DAYS[d.getDay()]}요일`;
+}
+function p2(n) { return String(n).padStart(2, '0'); }
+
+// ═══════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════
+let todaysItems = [];
+let checked = new Set();
+let score = 0;
+
+// ═══════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+function animNum(from, to, ms, cb) {
+  const start = performance.now();
+  const step = now => {
+    const p = Math.min((now - start) / ms, 1);
+    const e = 1 - Math.pow(1 - p, 3);
+    cb(Math.round(from + (to - from) * e));
+    if (p < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+// ═══════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════
+function renderItems() {
+  const list = document.getElementById('items-list');
+  list.innerHTML = '';
+  todaysItems.forEach((item, idx) => {
+    const cat = CATS[item.cat];
+    const isChecked = checked.has(idx);
+    const card = document.createElement('div');
+    card.className = `item-card cat-${item.cat}${isChecked ? ' checked' : ''}`;
+    card.dataset.idx = idx;
+    card.innerHTML = `
+      <div class="checkbox"><span class="check-mark">✓</span></div>
+      <span class="cat-icon">${cat.icon}</span>
+      <span class="item-text">${item.text}</span>`;
+    card.addEventListener('click', () => toggle(idx));
+    list.appendChild(card);
+  });
+}
+
+function toggle(idx) {
+  if (checked.has(idx)) checked.delete(idx);
+  else checked.add(idx);
+  const card = document.querySelector(`.item-card[data-idx="${idx}"]`);
+  if (card) card.classList.toggle('checked', checked.has(idx));
+  updateProgress();
+}
+
+function updateProgress() {
+  const n = checked.size;
+  document.getElementById('checked-count').textContent = n;
+  document.getElementById('progress-fill').style.width = `${(n / 15) * 100}%`;
+}
+
+// ═══════════════════════════════════════
+// RESULT
+// ═══════════════════════════════════════
+function showResult() {
+  score = Math.round(((15 - checked.size) / 15) * 100);
+
+  const catCounts = { sleep: 0, food: 0, digital: 0, health: 0, social: 0 };
+  checked.forEach(idx => catCounts[todaysItems[idx].cat]++);
+  let domCat = Object.keys(catCounts).reduce((a, b) => catCounts[a] >= catCounts[b] ? a : b);
+  const noDom = catCounts[domCat] === 0;
+
+  const ri = Math.min(Math.floor(score / 10), 9);
+  const range = RANGES[ri];
+  const grad = GRAD[ri];
+  const catInfo = CATS[domCat];
+  const quip = DAY_QUIPS[new Date().getDay()];
+
+  showScreen('screen-result');
+
+  animNum(0, score, 1300, n => {
+    document.getElementById('anim-pct').textContent = n;
+  });
+
+  document.getElementById('card-date-str').textContent = shortDateStr();
+  document.getElementById('card-pct').textContent = score;
+  document.getElementById('card-animal-emoji').textContent = range.emoji;
+  document.getElementById('card-animal-name').textContent = range.name;
+
+  if (noDom) {
+    document.getElementById('card-desc').textContent = `${range.desc}.`;
+    document.getElementById('card-badge').textContent = '🏆 완벽한 하루';
+  } else {
+    document.getElementById('card-desc').textContent = `${CAT_DESC[domCat]} 하루였습니다. ${range.desc}.`;
+    document.getElementById('card-badge').textContent = `${catInfo.icon} ${catInfo.name} 유형`;
+  }
+  document.getElementById('card-quip').textContent = quip;
+
+  const bg = document.getElementById('card-bg');
+  bg.style.background = `linear-gradient(155deg, ${grad[0]} 0%, ${grad[1]} 100%)`;
+
+  scaleCard();
+
+  setTimeout(() => {
+    const circ = 2 * Math.PI * 76;
+    const offset = circ * (1 - score / 100);
+    document.getElementById('c-prog').style.strokeDasharray = circ;
+    document.getElementById('c-prog').style.strokeDashoffset = offset;
+  }, 120);
+}
+
+function scaleCard() {
+  const wrap = document.getElementById('card-wrap');
+  const card = document.getElementById('result-card');
+  const maxW = Math.min(window.innerWidth, 390);
+  if (maxW < 390) {
+    const s = maxW / 390;
+    card.style.transformOrigin = 'top left';
+    card.style.transform = `scale(${s})`;
+    wrap.style.height = `${693 * s}px`;
+  } else {
+    card.style.transform = 'none';
+    wrap.style.height = '693px';
+  }
+}
+
+// ═══════════════════════════════════════
+// SAVE
+// ═══════════════════════════════════════
+async function saveImage() {
+  const card = document.getElementById('result-card');
+  const btn = document.getElementById('btn-save');
+  btn.textContent = '저장 중...';
+  btn.disabled = true;
+
+  const savedTransform = card.style.transform;
+  const savedOrigin = card.style.transformOrigin;
+  card.style.transform = 'none';
+  card.style.transformOrigin = 'top left';
+
+  await document.fonts.ready;
+
+  try {
+    const canvas = await html2canvas(card, {
+      scale: 2, useCORS: true, allowTaint: true,
+      backgroundColor: null, width: 390, height: 693, logging: false,
+    });
+
+    card.style.transform = savedTransform;
+    card.style.transformOrigin = savedOrigin;
+
+    const d = new Date();
+    const fname = `human-${d.getFullYear()}${p2(d.getMonth()+1)}${p2(d.getDate())}-${score}pct.png`;
+
+    try {
+      const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+      const file = new File([blob], fname, { type: 'image/png' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: '오늘 나는 몇 % 인간인가' });
+        toast('✅ 저장되었습니다!');
+        return;
+      }
+    } catch (_) {}
+
+    const link = document.createElement('a');
+    link.download = fname;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    toast('💾 저장 완료!');
+
+  } catch (e) {
+    card.style.transform = savedTransform;
+    card.style.transformOrigin = savedOrigin;
+    toast('저장에 실패했습니다');
+    console.error(e);
+  } finally {
+    btn.textContent = '💾 이미지 저장';
+    btn.disabled = false;
+  }
+}
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+function init() {
+  const ds = dateStr();
+  document.getElementById('intro-date').textContent = `📅 ${ds}`;
+  document.getElementById('test-date-display').textContent = ds;
+
+  todaysItems = getTodaysItems();
+  renderItems();
+
+  document.getElementById('btn-start').addEventListener('click', () => showScreen('screen-test'));
+  document.getElementById('btn-result').addEventListener('click', showResult);
+  document.getElementById('btn-save').addEventListener('click', saveImage);
+  document.getElementById('btn-retry').addEventListener('click', () => {
+    checked.clear();
+    updateProgress();
+    renderItems();
+    showScreen('screen-test');
+  });
+
+  window.addEventListener('resize', () => {
+    if (document.getElementById('screen-result').classList.contains('active')) scaleCard();
+  });
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
