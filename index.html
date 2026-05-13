@@ -826,7 +826,7 @@ function renderItems() {
     const scoreClass = isGood ? 'score-good' : 'score-bad';
 
     const card = document.createElement('div');
-    card.className = `item-card cat-${item.cat} type-${item.type}${isChecked ? ' checked' : ''}`;
+    card.className = `item-card cat-${item.cat}${isChecked ? ' checked' : ''}`;
     card.dataset.idx = idx;
     card.innerHTML = `
       <div class="checkbox"><span class="check-mark">✓</span></div>
